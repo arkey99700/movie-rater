@@ -1,0 +1,16 @@
+header  {
+	height: 65px;
+	
+	background-color: #555555;
+	
+	text-align: center;
+}
+
+.movie {
+	margin: 10% auto;
+	width: 500px;
+}
+
+.movie__cover  {
+	max-width: 500px;
+}

@@ -29,12 +29,15 @@ async function displayMovie(movie) {
     try {
       fetch(`https://kinopoiskapiunofficial.tech/api/v2.2/films/${movie.filmId}/images?type=COVER&page=1`, options)
         .then(response => response.json())
-        .then(response => movieCoverElement.src = response.items[0].imageUrl);
+        .then(response => {
+			movieCoverElement.src = response.items[0].imageUrl;
+			movieCoverElement.alt = movie.nameRu;
+			}
+		);
     } catch (error) {
     	console.log(error);
 		}
   }
-
   const collection = JSON.parse(localStorage.movieRaterCache),
     	movieTitleElement = document.querySelector(".movie__title"),
         movieCoverElement = document.querySelector(".movie__cover");
@@ -57,10 +60,9 @@ function getRandomMovie() {
 
 //Function that is called when rating a movie - set(movieRaterRating)
 function rateMovie(event) {
-	//rating is got from event.target
   const collection = JSON.parse(localStorage.movieRaterCache),
-  			movieId = currentMovie.kinopoiskId;
-  let rating;
+  		movieId = currentMovie.kinopoiskId;
+  let rating = event.target.value;
 
   collection[collection.findIndex(element => element.kinopoiskId === movieId)].movieRaterRating = rating;
   localStorage.setItem("movieRaterCache", JSON.stringify(collection));
@@ -73,8 +75,12 @@ const collections = ["TOP_250_BEST_FILMS", "TOP_100_POPULAR_FILMS" /*, "TOP_AWAI
           'X-API-KEY': '151451fe-e8fe-4c03-8157-f855dd4061d3',
           'Content-Type': 'application/json',
         },
-      }; //Options for fetch requests
+      }, //Options for fetch requests
+	  ratingBar = document.querySelector(".movie__rating");
 let currentMovie;
+
+ratingBar.addEventListener("mousemove", () => event.target.value = event.clientX * 5 / ratingBar.offsetWidth);
+ratingBar.addEventListener("click", rateMovie);
 
 if (!localStorage.movieRaterCache) cacheCollection(collections[0]);
 displayMovie(currentMovie = getRandomMovie());

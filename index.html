@@ -5,11 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Rater</title>
+	<link rel="stylesheet" href="reset.css"></link>
+	<link rel="stylesheet" href="style.css"></link>
 </head>
 <body>
-    <h1 class="movie__title"></h1>
-    <img class="movie__cover" src="" alt="">
-
+	<header class="header">
+		<a class="header__logo" href="#"><img href="img/logo.svg"></a>
+	</header>
+	
+	<div class="container">
+		<main class="movie">
+			<img class="movie__cover" src="#" alt="">
+			<h1 class="movie__title">Movie Title</h1>
+			<input class="movie__rating" type="range" min="1" max="5" step="1" value="0">
+			<button class="movie__skip">Пропустить!</button>
+		</main>
+	</div>
+		
     <script src="main.js"></script>
 </body>
 </html>
