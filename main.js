@@ -40,10 +40,12 @@ async function displayMovie(movie) {
   }
   const collection = JSON.parse(localStorage.movieRaterCache),
     	movieTitleElement = document.querySelector(".movie__title"),
-        movieCoverElement = document.querySelector(".movie__cover");
+      movieCoverElement = document.querySelector(".movie__cover"),
+      movieYearElement = document.querySelector(".movie__year");
 
   changeMovieCoverUrl();
   movieTitleElement.innerText = movie.nameRu;
+  movieYearElement.innerText = movie.year;
 }
 
 //Function for getting random movie from the cached collection
@@ -56,10 +58,10 @@ function getRandomMovie() {
     } while (false) //collection.filter(movie => "movieRaterRating" in movie));
 
     return result;
-  }
+}
 
-//Function that is called when rating a movie - set(movieRaterRating)
-function rateMovie(event) {
+//Function that is called when rating a movie
+function rateMovie(e) {
   const collection = JSON.parse(localStorage.movieRaterCache),
   		movieId = currentMovie.kinopoiskId;
   let rating = event.target.value;
@@ -76,11 +78,34 @@ const collections = ["TOP_250_BEST_FILMS", "TOP_100_POPULAR_FILMS" /*, "TOP_AWAI
           'Content-Type': 'application/json',
         },
       }, //Options for fetch requests
-	  ratingBar = document.querySelector(".movie__rating");
+    menuButton = document.querySelector(".header__hamburger"),
+    menu = document.querySelector(".header__menu"),
+    menuOverlay = document.querySelector(".overlay"),
+    movieScore = document.querySelector(".movie__score"),
+    overlay = document.querySelector(".overlay");
+    stars = [...document.querySelectorAll(".movie__star")],
+    ratingCaptions = ["Ужасный", "Плохой", "Средний", "Хороший", "Отличный!"];
 let currentMovie;
 
-ratingBar.addEventListener("mousemove", () => event.target.value = event.clientX * 5 / ratingBar.offsetWidth);
-ratingBar.addEventListener("click", rateMovie);
+menuButton.addEventListener("click", () => {
+  menu.classList.toggle("header__menu--open");
+  menuOverlay.classList.toggle("overlay--on");
+});
+stars.forEach(star => star.addEventListener("click", (event) => rateMovie(event.target.value)));
+stars.forEach(star => star.addEventListener("mouseleave", function() {
+  for (let i = 0; i < stars.length; i++) {
+    stars[i].style.fill = "black";
+  }
+  movieScore.textContent = "";
+}));
+stars.forEach(star => star.addEventListener("mouseenter", function() {
+  for (var i = 0; i < event.target.dataset.value; i++) {
+    stars[i].style.fill = "#FFB800";
+  }
+  movieScore.textContent = ratingCaptions[i - 1];
+}))
+overlay.addEventListener("click", () => menuButton.dispatchEvent(new Event("click")));
 
 if (!localStorage.movieRaterCache) cacheCollection(collections[0]);
 displayMovie(currentMovie = getRandomMovie());
+//displayMovie(JSON.parse(localStorage.movieRaterCache)[0]);

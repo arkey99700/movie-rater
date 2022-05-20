@@ -1,27 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Rater</title>
-	<link rel="stylesheet" href="reset.css"></link>
-	<link rel="stylesheet" href="style.css"></link>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Movie Rater</title>
+	<link href="reset.css" rel="stylesheet">
+	</link>
+	<link href="style.css" rel="stylesheet">
+	</link>
+	<link href="https://fonts.googleapis.com" rel="preconnect">
+	<link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
+
 <body>
+
+	<div class="overlay"></div>
+
 	<header class="header">
-		<a class="header__logo" href="#"><img href="img/logo.svg"></a>
+		<a class="header__logo" href="#">🎬 Movie Rater</a>
+		<div class="header__hamburger">
+			<svg width="30" height="19" viewBox="0 0 30 19" xmlns="http://www.w3.org/2000/svg">
+				<rect width="30" height="3" fill="white" />
+				<rect y="8" width="30" height="3" fill="white" />
+				<rect y="16" width="30" height="3" fill="white" />
+			</svg>
+		</div>
 	</header>
-	
-	<div class="container">
-		<main class="movie">
-			<img class="movie__cover" src="#" alt="">
-			<h1 class="movie__title">Movie Title</h1>
-			<input class="movie__rating" type="range" min="1" max="5" step="1" value="0">
-			<button class="movie__skip">Пропустить!</button>
-		</main>
-	</div>
-		
-    <script src="main.js"></script>
+
+	<aside class="header__menu">
+		<ul>
+			<li><a class="header__menu-item" href="">Ratings</a></li>
+			<li><a class="header__menu-item" href="">Clear history</a></li>
+		</ul>
+	</aside>
+
+	<main class="movie">
+		<div class="movie__container">
+			<div class="movie__image">
+				<img class="movie__cover" src="#" alt="">
+			</div>
+			<div class="movie__data">
+				<h1 class="movie__title">Movie Title</h1>
+				<h2 class="movie__year">1999</h2>
+				<div class="movie__rating">
+					<div><svg width="100" height="100" viewBox="0 0 130 130" fill="none"
+							xmlns="http://www.w3.org/2000/svg">
+							<path class="movie__star" d="M65 3.17957L84.8683 44.1729L130 50.4075L97.1533 81.9758L105.17 126.82L65 105.332L24.8246 126.82L32.8467 81.9758L0 50.4075L45.1317 44.1729L65 3.17957Z"
+								fill="black" data-value="1"/>
+						</svg>
+					</div>
+					<div><svg width="100" height="100" viewBox="0 0 130 130" fill="none"
+							xmlns="http://www.w3.org/2000/svg">
+							<path class="movie__star" d="M65 3.17957L84.8683 44.1729L130 50.4075L97.1533 81.9758L105.17 126.82L65 105.332L24.8246 126.82L32.8467 81.9758L0 50.4075L45.1317 44.1729L65 3.17957Z"
+								fill="black" data-value="2"/>
+						</svg>
+					</div>
+					<div><svg width="100" height="100" viewBox="0 0 130 130" fill="none"
+							xmlns="http://www.w3.org/2000/svg">
+							<path class="movie__star" d="M65 3.17957L84.8683 44.1729L130 50.4075L97.1533 81.9758L105.17 126.82L65 105.332L24.8246 126.82L32.8467 81.9758L0 50.4075L45.1317 44.1729L65 3.17957Z"
+								fill="black" data-value="3"/>
+						</svg>
+					</div>
+					<div><svg width="100" height="100" viewBox="0 0 130 130" fill="none"
+							xmlns="http://www.w3.org/2000/svg">
+							<path class="movie__star" d="M65 3.17957L84.8683 44.1729L130 50.4075L97.1533 81.9758L105.17 126.82L65 105.332L24.8246 126.82L32.8467 81.9758L0 50.4075L45.1317 44.1729L65 3.17957Z"
+								fill="black" data-value="4"/>
+						</svg>
+					</div>
+					<div><svg width="100" height="100" viewBox="0 0 130 130" fill="none"
+							xmlns="http://www.w3.org/2000/svg">
+							<path class="movie__star" d="M65 3.17957L84.8683 44.1729L130 50.4075L97.1533 81.9758L105.17 126.82L65 105.332L24.8246 126.82L32.8467 81.9758L0 50.4075L45.1317 44.1729L65 3.17957Z"
+								fill="black" data-value="5"/>
+						</svg>
+					</div>
+					<span class="movie__score"></span>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<script src="main.js"></script>
 </body>
+
 </html>
