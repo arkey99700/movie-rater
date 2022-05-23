@@ -1,4 +1,3 @@
-//Function to cache the content of the collection to reduce the number of API requests
 async function cacheCollection(collectionName) {
   var collectionLength = 1;
   let tempStorage = [];
@@ -23,9 +22,9 @@ async function cacheCollection(collectionName) {
   localStorage.setItem("movieRaterCache", JSON.stringify(tempStorage.flat(1)));
 }
 
-//Main function to show movie title and cover image
 async function displayMovie(movie) {
   function changeMovieCoverUrl() {
+    movieCoverElement.src = "img/none.png"
     try {
       fetch(`https://kinopoiskapiunofficial.tech/api/v2.2/films/${movie.filmId}/images?type=COVER&page=1`, options)
         .then(response => response.json())
@@ -48,26 +47,48 @@ async function displayMovie(movie) {
   movieYearElement.innerText = movie.year;
 }
 
-//Function for getting random movie from the cached collection
 function getRandomMovie() {
 		const collection = JSON.parse(localStorage.movieRaterCache);
 		let result;
     
     do {
     	result = collection[Math.floor(Math.random() * (collection.length + 1))];
-    } while (false) //collection.filter(movie => "movieRaterRating" in movie));
+    } while (result.movieRaterRating);
 
     return result;
 }
 
-//Function that is called when rating a movie
-function rateMovie(e) {
+function rateMovie(rating) {
   const collection = JSON.parse(localStorage.movieRaterCache),
-  		movieId = currentMovie.kinopoiskId;
-  let rating = event.target.value;
+  		  movieId = currentMovie.filmId;
 
-  collection[collection.findIndex(element => element.kinopoiskId === movieId)].movieRaterRating = rating;
+  collection[collection.map((movie) => movie.filmId).indexOf(movieId)].movieRaterRating = rating;
   localStorage.setItem("movieRaterCache", JSON.stringify(collection));
+  updateRatings();
+}
+
+function clearHistory() {
+  const collection = JSON.parse(localStorage.movieRaterCache);
+
+  for (let i = 0; i < collection.length; i++) {
+    collection[i].movieRaterRating = null;
+  };
+
+  localStorage.setItem("movieRaterCache", JSON.stringify(collection));
+  menuButton.dispatchEvent(new Event("click"));
+}
+
+function updateRatings() {
+  const collection = JSON.parse(localStorage.movieRaterCache),
+        ratedMovies = collection.filter((movie) => Number(movie.movieRaterRating) >= 1); 
+
+  for (let i = 0; i < ratedMovies.length; i++) {
+    let item = document.createElement("span");
+
+    item.className = "header__ratings-item";
+    item.innerHTML += `${ratedMovies[i].nameRu}: ${ratedMovies[i].movieRaterRating}`;
+    ratingsList.appendChild(item);
+  }
 }
 
 const collections = ["TOP_250_BEST_FILMS", "TOP_100_POPULAR_FILMS" /*, "TOP_AWAIT_FILMS"*/ ], //List of available movie collections
@@ -78,6 +99,9 @@ const collections = ["TOP_250_BEST_FILMS", "TOP_100_POPULAR_FILMS" /*, "TOP_AWAI
           'Content-Type': 'application/json',
         },
       }, //Options for fetch requests
+    clearHistoryButton = document.querySelector(".header__menu-item--clear"),
+    showRatingsButton = document.querySelector(".header__menu-item--ratings"),
+    ratingsList = document.querySelector(".header__ratings"),
     menuButton = document.querySelector(".header__hamburger"),
     menu = document.querySelector(".header__menu"),
     menuOverlay = document.querySelector(".overlay"),
@@ -87,25 +111,51 @@ const collections = ["TOP_250_BEST_FILMS", "TOP_100_POPULAR_FILMS" /*, "TOP_AWAI
     ratingCaptions = ["Ужасный", "Плохой", "Средний", "Хороший", "Отличный!"];
 let currentMovie;
 
+if (!localStorage.movieRaterCache) cacheCollection(collections[0]);
+
+updateRatings();
+
 menuButton.addEventListener("click", () => {
   menu.classList.toggle("header__menu--open");
   menuOverlay.classList.toggle("overlay--on");
+  if (showRatingsButton.dataset.state === "1") {
+    showRatingsButton.dataset.state = "0";
+    ratingsList.style.display = "none";
+  }
 });
-stars.forEach(star => star.addEventListener("click", (event) => rateMovie(event.target.value)));
+stars.forEach(star => star.addEventListener("click", function(event) {
+  rateMovie(event.target.dataset.value);
+  displayMovie(currentMovie = getRandomMovie());
+}));
 stars.forEach(star => star.addEventListener("mouseleave", function() {
   for (let i = 0; i < stars.length; i++) {
     stars[i].style.fill = "black";
   }
-  movieScore.textContent = "";
+  movieScore.textContent = "Не смотрел(а)";
 }));
 stars.forEach(star => star.addEventListener("mouseenter", function() {
   for (var i = 0; i < event.target.dataset.value; i++) {
     stars[i].style.fill = "#FFB800";
   }
   movieScore.textContent = ratingCaptions[i - 1];
-}))
+}));
+movieScore.addEventListener("click", function() {
+  displayMovie(currentMovie = getRandomMovie());
+});
 overlay.addEventListener("click", () => menuButton.dispatchEvent(new Event("click")));
+clearHistoryButton.addEventListener("click", function(event) {
+  event.preventDefault();
+  clearHistory();
+});
+showRatingsButton.addEventListener("click", function(event) {
+  event.preventDefault();
+  if (event.target.dataset.state === "0") {
+    ratingsList.style.display = "block";
+    event.target.dataset.state = "1";
+  } else {
+    ratingsList.style.display = "none";
+    event.target.dataset.state = "0";
+  };
+})
 
-if (!localStorage.movieRaterCache) cacheCollection(collections[0]);
 displayMovie(currentMovie = getRandomMovie());
-//displayMovie(JSON.parse(localStorage.movieRaterCache)[0]);
