@@ -22,29 +22,15 @@ async function cacheCollection(collectionName) {
   localStorage.setItem("movieRaterCache", JSON.stringify(tempStorage.flat(1)));
 }
 
-async function displayMovie(movie) {
-  function changeMovieCoverUrl() {
-    movieCoverElement.src = "img/none.png"
-    try {
-      fetch(`https://kinopoiskapiunofficial.tech/api/v2.2/films/${movie.filmId}/images?type=COVER&page=1`, options)
-        .then(response => response.json())
-        .then(response => {
-			movieCoverElement.src = response.items[0].imageUrl;
-			movieCoverElement.alt = movie.nameRu;
-			}
-		);
-    } catch (error) {
-    	console.log(error);
-		}
-  }
-  const collection = JSON.parse(localStorage.movieRaterCache),
-    	movieTitleElement = document.querySelector(".movie__title"),
-      movieCoverElement = document.querySelector(".movie__cover"),
-      movieYearElement = document.querySelector(".movie__year");
+function displayMovie(movie) {
+  const movieTitleElement = document.querySelector(".movie__title"),
+        movieCoverElement = document.querySelector(".movie__cover"),
+        movieYearElement = document.querySelector(".movie__year");
 
-  changeMovieCoverUrl();
+  movieCoverElement.src = "img/none.png"
   movieTitleElement.innerText = movie.nameRu;
   movieYearElement.innerText = movie.year;
+  movieCoverElement.src = movie.posterUrl;
 }
 
 function getRandomMovie() {
@@ -62,9 +48,10 @@ function rateMovie(rating) {
   const collection = JSON.parse(localStorage.movieRaterCache),
   		  movieId = currentMovie.filmId;
 
+  currentMovie.movieRaterRating = rating;
   collection[collection.map((movie) => movie.filmId).indexOf(movieId)].movieRaterRating = rating;
   localStorage.setItem("movieRaterCache", JSON.stringify(collection));
-  updateRatings();
+  addToUserRatings(currentMovie);
 }
 
 function clearHistory() {
@@ -75,30 +62,50 @@ function clearHistory() {
   };
 
   localStorage.setItem("movieRaterCache", JSON.stringify(collection));
+  ratingsList.innerHTML = "";
   menuButton.dispatchEvent(new Event("click"));
 }
 
-function updateRatings() {
-  const collection = JSON.parse(localStorage.movieRaterCache),
-        ratedMovies = collection.filter((movie) => Number(movie.movieRaterRating) >= 1); 
+function loadUserRatings() {
+    const collection = JSON.parse(localStorage.movieRaterCache);
+    let ratedMovies = [];
 
-  for (let i = 0; i < ratedMovies.length; i++) {
-    let item = document.createElement("span");
+    collection.forEach(function(movie) {
+      if (movie.movieRaterRating) {
+        ratedMovies.push(movie);
+      };
+    });
 
-    item.className = "header__ratings-item";
-    item.innerHTML += `${ratedMovies[i].nameRu}: ${ratedMovies[i].movieRaterRating}`;
-    ratingsList.appendChild(item);
-  }
+    ratedMovies.forEach((movie) => addToUserRatings(movie));
 }
 
-const collections = ["TOP_250_BEST_FILMS", "TOP_100_POPULAR_FILMS" /*, "TOP_AWAIT_FILMS"*/ ], //List of available movie collections
+function addToUserRatings(movie) {
+    let movieItem = document.createElement("div"),
+        movieItemImg = document.createElement("div"),
+        movieItemRating = document.createElement("div"),
+        movieItemName = document.createElement("span");
+
+    movieItem.classList.add("header__ratings-item");
+    movieItemImg.classList.add("header__ratings-img");
+    movieItemName.classList.add("header__ratings-name");
+    movieItemRating.classList.add("header__ratings-score");
+    movieItemImg.style.backgroundImage = `url(${movie.posterUrl})`;
+    movieItemName.textContent = movie.nameRu;
+    movieItemRating.innerHTML = "⭐".repeat(+movie.movieRaterRating);
+    movieItem.appendChild(movieItemImg);
+    movieItem.appendChild(movieItemRating);
+    movieItem.appendChild(movieItemName);
+    ratingsList.appendChild(movieItem);
+}
+
+const collections = ["TOP_250_BEST_FILMS", "TOP_100_POPULAR_FILMS"/*, "TOP_AWAIT_FILMS"*/],
       options = {
         method: 'GET',
         headers: {
           'X-API-KEY': '151451fe-e8fe-4c03-8157-f855dd4061d3',
           'Content-Type': 'application/json',
         },
-      }, //Options for fetch requests
+      },
     clearHistoryButton = document.querySelector(".header__menu-item--clear"),
     showRatingsButton = document.querySelector(".header__menu-item--ratings"),
     ratingsList = document.querySelector(".header__ratings"),
@@ -112,8 +119,6 @@ const collections = ["TOP_250_BEST_FILMS", "TOP_100_POPULAR_FILMS" /*, "TOP_AWAI
 let currentMovie;
 
 if (!localStorage.movieRaterCache) cacheCollection(collections[0]);
-
-updateRatings();
 
 menuButton.addEventListener("click", () => {
   menu.classList.toggle("header__menu--open");
@@ -150,7 +155,7 @@ clearHistoryButton.addEventListener("click", function(event) {
 showRatingsButton.addEventListener("click", function(event) {
   event.preventDefault();
   if (event.target.dataset.state === "0") {
-    ratingsList.style.display = "block";
+    ratingsList.style.display = "flex";
     event.target.dataset.state = "1";
   } else {
     ratingsList.style.display = "none";
@@ -158,4 +163,5 @@ showRatingsButton.addEventListener("click", function(event) {
   };
 })
 
+loadUserRatings();
 displayMovie(currentMovie = getRandomMovie());

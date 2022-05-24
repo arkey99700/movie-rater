@@ -105,17 +105,36 @@ body {
 
 .header__ratings {
 	display: none;
-	flex-direction: column;
+	flex-wrap: wrap;
 	justify-content: space-around;
 	padding: 10px;
-	min-height: 50px;
+	max-height: calc(100vh - 136px);
 
 	color: #ffffff;
 	font-size: 24px;
+
+	overflow-y: auto;
 }
 
 .header__ratings-item {
-	
+	padding: 15px 0;
+	max-width: 160px;
+
+	text-align: center;
+}
+
+.header__ratings-img {
+	margin-bottom: 5px;
+	width: 160px;
+	height: 225px;
+
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.header__ratings-name {
+	font-size: 0.8em;
 }
 
 .overlay {
@@ -173,7 +192,7 @@ body {
 	flex-direction: column;
 	flex-wrap: wrap;
 	padding: 50px 0 0 50px;
-	max-width: 600px;
+	width: 600px;
 }
 
 .movie__title,
