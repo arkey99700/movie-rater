@@ -247,3 +247,32 @@ body {
 .movie__star--active {
 	fill: #FFB800;
 }
+
+.popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 175px;
+  width: 300px;
+  
+  background-color: var(--bg-green);
+  border-radius: 20px;
+  
+  z-index: 10;
+}
+
+.popup__text {
+  
+}
+
+.popup__list {
+
+}
+
+.popup__list-item {
+  cursor: pointer;
+}

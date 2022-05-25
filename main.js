@@ -1,10 +1,12 @@
-async function cacheCollection(collectionName) {
+async function cacheCollection(collectionId) {
   var collectionLength = 1;
   let tempStorage = [];
+  
+  currentCollectionId = collectionId;
 
   for (let i = 1; i <= collectionLength; i++) {
     try {
-      await fetch(`https://kinopoiskapiunofficial.tech/api/v2.2/films/top?type=${collectionName}&page=${i}`, options)
+      await fetch(`https://kinopoiskapiunofficial.tech/api/v2.2/films/top?type=${collectionId}&page=${i}`, options)
         .then(response => {
           if (response.ok) {
             return response.json();
@@ -34,14 +36,24 @@ function displayMovie(movie) {
 }
 
 function getRandomMovie() {
-		const collection = JSON.parse(localStorage.movieRaterCache);
-		let result;
+	const collection = JSON.parse(localStorage.movieRaterCache);
+	let result;
     
-    do {
-    	result = collection[Math.floor(Math.random() * (collection.length + 1))];
-    } while (result.movieRaterRating);
-
-    return result;
+    function getUnratedMovie(moviesLeft) {
+    	if (moviesLeft > 0) {
+        	let temp = collection[Math.floor(Math.random() * (collection.length + 1))];
+			
+            if ((temp.movieRaterRating === null) || (temp.movieRaterRating === undefined)) {
+    			return temp;
+    		} else {
+    			return getUnratedMovie(moviesLeft - 1);
+    		}
+            
+            return null;
+        }
+    }
+    
+    return result = getUnratedMovie(collection.length) || showNoMoreMoviesPopup();
 }
 
 function rateMovie(rating) {
@@ -98,8 +110,45 @@ function addToUserRatings(movie) {
     ratingsList.appendChild(movieItem);
 }
 
-const collections = ["TOP_250_BEST_FILMS", "TOP_100_POPULAR_FILMS"/*, "TOP_AWAIT_FILMS"*/],
-      options = {
+function showNoMoreMoviesPopup() {
+	let popup = document.createElement("div"),
+    	popupText = document.createElement("p"),
+        popupList = document.createElement("ul");
+        
+    menuOverlay.classList.toggle("overlay--on");
+    popupText.textContent = "Вы просмотрели все фильмы в этой коллекции. Выберите другую коллекцию.";
+    popup.classList.add("popup");
+    
+    for (let i = 0; i < collections.length; i++) {
+		let popupListItem = document.createElement("a");
+        
+        if (currentCollectionId !== collections[i].id) popupListItem.textContent = collections[i].nameRu;
+        
+        popupListItem.addEventListener("click", function(event) {
+			cacheCollection(collections.filter((collection) => collection.id === event.target.textContent));
+            displayMovie(currentMovie = getRandomMovie());
+            menuOverlay.classList.toggle("overlay--on");
+            popup.style.display = "none";
+        });
+        
+        popupList.appendChild(popupListItem);
+	}
+    
+    popup.appendChild(popupText);
+    popup.appendChild(popupList);    
+    document.body.appendChild(popup);
+}
+
+const collections = [
+        {
+            id: "TOP_250_BEST_FILMS",
+            nameRu: "250 лучших фильмов"
+        }, {
+            id: "TOP_100_POPULAR_FILMS",
+            nameRu: "100 лучших фильмов всех времен"
+        }
+    ],
+    options = {
         method: 'GET',
         headers: {
           'X-API-KEY': '151451fe-e8fe-4c03-8157-f855dd4061d3',
@@ -113,12 +162,30 @@ const collections = ["TOP_250_BEST_FILMS", "TOP_100_POPULAR_FILMS"/*, "TOP_AWAIT
     menu = document.querySelector(".header__menu"),
     menuOverlay = document.querySelector(".overlay"),
     movieScore = document.querySelector(".movie__score"),
-    overlay = document.querySelector(".overlay");
+    overlay = document.querySelector(".overlay"),
     stars = [...document.querySelectorAll(".movie__star")],
     ratingCaptions = ["Ужасный", "Плохой", "Средний", "Хороший", "Отличный!"];
-let currentMovie;
+    
+let currentMovie,
+    currentCollectionId,
+    debugCollection;
 
-if (!localStorage.movieRaterCache) cacheCollection(collections[0]);
+//if (!localStorage.movieRaterCache) cacheCollection(collections[0].id);
+
+debugCollection = [
+	{
+		filmId: "debug1",
+        nameRu: "Дебаг 1"
+    }, {
+    	filmId: "debug2",
+        nameRu: "Дебаг 2"
+    }, {
+    	filmId: "debug3",
+        nameRu: "Дебаг 3"
+    }
+];
+
+localStorage.setItem("movieRaterCache", JSON.stringify(debugCollection))
 
 menuButton.addEventListener("click", () => {
   menu.classList.toggle("header__menu--open");
