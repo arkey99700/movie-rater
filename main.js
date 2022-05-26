@@ -25,22 +25,18 @@ async function cacheCollection(collectionId) {
 }
 
 function displayMovie(movie) {
-  const movieTitleElement = document.querySelector(".movie__title"),
-    movieCoverElement = document.querySelector(".movie__cover"),
-    movieYearElement = document.querySelector(".movie__year");
-
-  movieCoverElement.src = "img/none.png"
+  //movieCoverElement.style.backgroundImage = "url('img/none.png')";
   movieTitleElement.innerText = movie.nameRu;
   movieYearElement.innerText = movie.year;
-  movieCoverElement.src = movie.posterUrl;
+  movieCoverElement.style.backgroundImage = `url(${movie.posterUrl})`;
 }
 
 function getRandomMovie() {
   const collection = JSON.parse(localStorage.movieRaterCache),
         unratedMovies = collection.filter((movie) => movie.movieRaterRating === null || !movie.hasOwnProperty("movieRaterRating"));
 
-  if (unratedMovies.length === 1) {
-    showNoMoreMoviesPopup();
+  if (unratedMovies.length === 0) {
+    return showNoMoreMoviesPopup();
   } else {
     return unratedMovies[Math.floor(Math.random() * (unratedMovies.length))];
   }
@@ -106,22 +102,26 @@ function showNoMoreMoviesPopup() {
       popupList = document.createElement("ul");
 
   menuOverlay.classList.toggle("overlay--on");
-  popupText.textContent = "Вы просмотрели все фильмы в этой коллекции. Выберите другую коллекцию.";
   popup.classList.add("popup");
+  popupText.textContent = "Вы просмотрели все фильмы в этой коллекции, выберите другую коллекцию:";
+  popupText.classList.add("popup__text");
 
   for (let i = 0; i < collections.length; i++) {
-    let popupListItem = document.createElement("a");
+    let popupListLink = document.createElement("a"),
+        popupListItem = document.createElement("li");
 
-    if (currentCollectionId !== collections[i].id) popupListItem.textContent = collections[i].nameRu;
+    if (currentCollectionId !== collections[i].id) popupListLink.textContent = collections[i].nameRu;
 
-    popupListItem.addEventListener("click", function (event) {
-      cacheCollection(collections.filter((collection) => collection.id === event.target.textContent));
-      displayMovie(currentMovie = getRandomMovie());
+    popupListLink.addEventListener("click", function (event) {
       menuOverlay.classList.toggle("overlay--on");
       popup.style.display = "none";
+      cacheCollection(collections.filter((collection) => collection.id === event.target.textContent));
+      displayMovie(currentMovie = getRandomMovie());
     });
 
     popupListItem.classList.add("popup__list-item");
+    popupListLink.classList.add("popup__list-link");
+    popupListItem.appendChild(popupListLink);
     popupList.appendChild(popupListItem);
   }
 
@@ -153,6 +153,9 @@ const collections = [
   menu = document.querySelector(".header__menu"),
   menuOverlay = document.querySelector(".overlay"),
   movieScore = document.querySelector(".movie__score"),
+  movieTitleElement = document.querySelector(".movie__title"),
+  movieCoverElement = document.querySelector(".movie__cover"),
+  movieYearElement = document.querySelector(".movie__year"),
   overlay = document.querySelector(".overlay"),
   stars = [...document.querySelectorAll(".movie__star")],
   ratingCaptions = ["Ужасный", "Плохой", "Средний", "Хороший", "Отличный!"];
@@ -161,7 +164,11 @@ let currentMovie,
     currentCollectionId,
     debugCollection;
 
-if (!localStorage.movieRaterCache) cacheCollection(collections[0].id);
+(async function() {
+  if (!localStorage.movieRaterCache || localStorage.movieRaterCache === "undefined") await cacheCollection(collections[0].id);
+  //loadUserRatings();
+  displayMovie(currentMovie = getRandomMovie());
+})();
 
 menuButton.addEventListener("click", () => {
   menu.classList.toggle("header__menu--open");
@@ -205,6 +212,3 @@ showRatingsButton.addEventListener("click", function (event) {
     event.target.dataset.state = "0";
   };
 })
-
-loadUserRatings();
-displayMovie(currentMovie = getRandomMovie());
