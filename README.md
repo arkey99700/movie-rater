@@ -1,2 +1,4 @@
 # movie-rater
-A simple app that lets you rate a movie on a scale of 1 to 5
+Movie Rater lets you rate movies from one of the available collections (rigth now there are two of them). Movie collections are loaded with the help of fetch() and stored in the localStorage. Written in vanilla js/html/css. My first big-ish project :)
+
+**Deployed version:**
