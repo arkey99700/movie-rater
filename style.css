@@ -1,13 +1,7 @@
 :root {
 	--bg-green: #426427;
-	--bg-blue: #234381;
-	--bg-orange: #A14F02;
-	--msgbox-green: #95BD75;
-	--msgbox-blue: #88A1D0;
-	--msgbox-orange: #E29853;
-	--text-green: #1A3107;
-	--text-blue: #04112C;
-	--text-orange: #311B06;
+	--msgbox-green: #95bd75;
+	--text-green: #1a3107;
 }
 
 body {
@@ -18,13 +12,13 @@ body {
 	overflow: hidden;
 }
 
-.header  {
+.header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	padding: 0 20px;
 	height: 60px;
-	
+
 	background-color: #000000;
 }
 
@@ -64,7 +58,7 @@ body {
 	position: absolute;
 	right: -400px;
 	top: 0;
-	
+
 	padding: 60px 15px 0 15px;
 	width: 400px;
 	height: 100vh;
@@ -166,7 +160,7 @@ body {
 	padding: 0 10%;
 }
 
-.movie__image  {
+.movie__image {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -203,7 +197,7 @@ body {
 	padding: 5px 20px 5px 20px;
 	width: fit-content;
 
-	line-height: initial;	
+	line-height: initial;
 	text-align: left;
 
 	background-color: var(--msgbox-green);
@@ -247,43 +241,43 @@ body {
 }
 
 .movie__star--active {
-	fill: #FFB800;
+	fill: #ffb800;
 }
 
 .popup {
-  box-sizing: border-box;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 30px;
-  height: 300px;
-  width: 400px;
-  
-  background-color: var(--bg-green);
-  border-radius: 20px;
-  
-  color: #ffffff;
-  text-align: center;
-  font-size: 28px;
+	box-sizing: border-box;
+	position: absolute;
+	top: 50%;
+	left: 50%;
 
-  transform: translate(-50%, -50%);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 30px;
+	height: 300px;
+	width: 400px;
 
-  z-index: 10;
+	background-color: var(--bg-green);
+	border-radius: 20px;
+
+	color: #ffffff;
+	text-align: center;
+	font-size: 28px;
+
+	transform: translate(-50%, -50%);
+
+	z-index: 10;
 }
 
 .popup__text {
-  margin-bottom: 20px;
+	margin-bottom: 20px;
 
-  color: #ffffff;
+	color: #ffffff;
 }
 
 .popup__list-item {
-  list-style: none;
+	list-style: none;
 }
 
 .popup__list-link,
@@ -291,8 +285,8 @@ body {
 .popup__list-link:visited,
 .popup__list-link:focus,
 .popup__list-link:active {
-  text-decoration: none;
-  color: #ffffff;
+	text-decoration: none;
+	color: #ffffff;
 }
 
 .popup__list-link:hover {

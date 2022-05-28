@@ -2,6 +2,7 @@ async function cacheCollection(collectionId) {
   var collectionLength = 1;
   let tempStorage = [];
 
+  localStorage.removeItem("movieRaterCache");
   currentCollectionId = collectionId;
 
   for (let i = 1; i <= collectionLength; i++) {
@@ -25,7 +26,6 @@ async function cacheCollection(collectionId) {
 }
 
 function displayMovie(movie) {
-  //movieCoverElement.style.backgroundImage = "url('img/none.png')";
   movieTitleElement.innerText = movie.nameRu;
   movieYearElement.innerText = movie.year;
   movieCoverElement.style.backgroundImage = `url(${movie.posterUrl})`;
@@ -33,13 +33,9 @@ function displayMovie(movie) {
 
 function getRandomMovie() {
   const collection = JSON.parse(localStorage.movieRaterCache),
-        unratedMovies = collection.filter((movie) => movie.movieRaterRating === null || !movie.hasOwnProperty("movieRaterRating"));
+    unratedMovies = collection.filter((movie) => movie.movieRaterRating === null || !movie.hasOwnProperty("movieRaterRating"));
 
-  if (unratedMovies.length === 0) {
-    return showNoMoreMoviesPopup();
-  } else {
     return unratedMovies[Math.floor(Math.random() * (unratedMovies.length))];
-  }
 }
 
 function rateMovie(rating) {
@@ -98,25 +94,27 @@ function addToUserRatings(movie) {
 
 function showNoMoreMoviesPopup() {
   let popup = document.createElement("div"),
-      popupText = document.createElement("p"),
-      popupList = document.createElement("ul");
+    popupText = document.createElement("p"),
+    popupList = document.createElement("ul");
 
   menuOverlay.classList.toggle("overlay--on");
+  menuOverlay.dataset.clickable = "false";
   popup.classList.add("popup");
   popupText.textContent = "Вы просмотрели все фильмы в этой коллекции, выберите другую коллекцию:";
   popupText.classList.add("popup__text");
 
   for (let i = 0; i < collections.length; i++) {
     let popupListLink = document.createElement("a"),
-        popupListItem = document.createElement("li");
+      popupListItem = document.createElement("li");
 
     if (currentCollectionId !== collections[i].id) popupListLink.textContent = collections[i].nameRu;
 
-    popupListLink.addEventListener("click", function (event) {
-      menuOverlay.classList.toggle("overlay--on");
+    popupListLink.addEventListener("click", async function () {
       popup.style.display = "none";
-      cacheCollection(collections.filter((collection) => collection.id === event.target.textContent));
+      menuOverlay.dataset.clickable = "true";
+      await cacheCollection(collections[i].id);
       displayMovie(currentMovie = getRandomMovie());
+      menuOverlay.classList.toggle("overlay--on");
     });
 
     popupListItem.classList.add("popup__list-item");
@@ -161,12 +159,12 @@ const collections = [
   ratingCaptions = ["Ужасный", "Плохой", "Средний", "Хороший", "Отличный!"];
 
 let currentMovie,
-    currentCollectionId,
-    debugCollection;
+  currentCollectionId,
+  debugCollection;
 
-(async function() {
+(async function () {
   if (!localStorage.movieRaterCache || localStorage.movieRaterCache === "undefined") await cacheCollection(collections[0].id);
-  //loadUserRatings();
+  loadUserRatings();
   displayMovie(currentMovie = getRandomMovie());
 })();
 
@@ -180,7 +178,9 @@ menuButton.addEventListener("click", () => {
 });
 stars.forEach(star => star.addEventListener("click", function (event) {
   rateMovie(event.target.dataset.value);
-  displayMovie(currentMovie = getRandomMovie());
+  if (JSON.parse(localStorage.movieRaterCache).filter((movie) => movie.movieRaterRating === null || !movie.hasOwnProperty("movieRaterRating")).length) {
+    displayMovie(currentMovie = getRandomMovie())
+  } else showNoMoreMoviesPopup();
 }));
 stars.forEach(star => star.addEventListener("mouseleave", function () {
   for (let i = 0; i < stars.length; i++) {
@@ -188,7 +188,7 @@ stars.forEach(star => star.addEventListener("mouseleave", function () {
   }
   movieScore.textContent = "Не смотрел(а)";
 }));
-stars.forEach(star => star.addEventListener("mouseenter", function () {
+stars.forEach(star => star.addEventListener("mouseenter", function (event) {
   for (var i = 0; i < event.target.dataset.value; i++) {
     stars[i].style.fill = "#FFB800";
   }
@@ -197,7 +197,9 @@ stars.forEach(star => star.addEventListener("mouseenter", function () {
 movieScore.addEventListener("click", function () {
   displayMovie(currentMovie = getRandomMovie());
 });
-overlay.addEventListener("click", () => menuButton.dispatchEvent(new Event("click")));
+overlay.addEventListener("click", function(event) {
+  if (event.target.dataset.clickable === "true") menuButton.dispatchEvent(new Event("click"));
+});
 clearHistoryButton.addEventListener("click", function (event) {
   event.preventDefault();
   clearHistory();
